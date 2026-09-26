@@ -856,6 +856,10 @@ $('help').addEventListener('click', () => {
   const content = $<HTMLElement>('help-content')
   // The README is part of this repository, so its HTML is trusted.
   if (!content.innerHTML) content.innerHTML = marked.parse(readme, { async: false })
+  // GitHub-style heading ids, so links like #uploading-with-radiouploader work here too.
+  content.querySelectorAll('h1, h2, h3').forEach((h) => {
+    h.id = (h.textContent ?? '').trim().toLowerCase().replace(/[^\w\- ]+/g, '').replace(/ /g, '-')
+  })
   content.querySelectorAll('a[href^="http"]').forEach((a) => {
     a.setAttribute('target', '_blank')
     a.setAttribute('rel', 'noopener')

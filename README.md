@@ -73,8 +73,8 @@ two between two key slices is not handled well. Add a key slice in between.
 - **PNG or JPEG**: numbered images (`001.png`, `002.png`…) for a manual upload to Radiopaedia.
 - **DICOM Secondary Capture** (RGB, explicit VR little endian): a new series in the same study.
   It keeps the StudyInstanceUID, gets a new SeriesInstanceUID and SeriesNumber 9001, and copies
-  the position, orientation and InstanceNumber of each source slice, so Radiouploader uploads
-  it next to the original series.
+  the position, orientation and InstanceNumber of each source slice. See
+  [Uploading with Radiouploader](#uploading-with-radiouploader).
 - **Also the same series without overlay**: writes the same slices without color
   (SeriesNumber 9002), with the same window and scale, to give two aligned stacks for a
   before/after comparison.
@@ -90,6 +90,38 @@ The zip has an `annotated/` folder and, with the option above, an `original/` fo
 **The exported DICOM files keep the patient data of the source series.** Anonymize them before
 sharing them; Radiouploader does this when it uploads. PNG and JPEG files carry no metadata.
 
+## Uploading with Radiouploader
+
+[Radiouploader](https://github.com/gmadevs/Radiouploader) is a desktop app that anonymizes a
+DICOM study and uploads it to Radiopaedia as a draft case. It reads the DICOM Secondary Capture
+series that RadioIllustrator exports.
+
+1. In **Export…**, tick **DICOM Secondary Capture (for Radiouploader)**. Type the series
+   description you want on Radiopaedia in **Series description**.
+2. Unzip the export. Put its `annotated/dicom` folder (and `original/dicom`, if you exported
+   it) in the same folder as the original DICOM study.
+3. Drop that folder onto Radiouploader, or choose it with **Choose folder**. Radiouploader reads
+   subfolders.
+
+Radiouploader then shows the annotated series in the same study as the original, as a separate
+series with SeriesNumber 9001 and your description, with the slices in the original order. Its
+anonymizer (Radiopaedia's) removes the patient name and
+ID, and keeps the series description, the slice positions and the pixels unchanged.
+
+Points to check in Radiouploader:
+
+- The anonymizer warns that the series description may contain personal data. It gives this
+  warning for long text fields. The description is the text from the export dialog, so check
+  that it holds no patient data.
+- The annotated series is color, and Radiouploader applies its window only to grayscale
+  images. The window is the one set in RadioIllustrator before exporting.
+- A legend exported with **Legend** is text in the pixels. The burnt-in text check before
+  anonymizing may mark it. The legend contains only the structure names.
+
+This was tested with Radiouploader 1.5.6, by running its import and anonymizer code on a CT
+series and the Secondary Capture series exported from it. The upload to Radiopaedia was not
+part of the test.
+
 ## Saving your work
 
 Annotations are saved automatically in the browser (localStorage), per series, and come back
@@ -99,6 +131,27 @@ when you open the same series again. Browser storage is per site: annotations ma
 **Save annotations** downloads a `.radioillustrator.json` file with the key slices, run-length
 encoded. **Load annotations**, or dropping the file onto the window, opens it on the same
 series. Interpolated slices are rebuilt on load.
+
+## Privacy
+
+The app loads its HTML, JavaScript and CSS from GitHub Pages. GitHub receives that page
+request, as for any website (IP address and browser). DICOM files are then read, drawn on and
+exported inside the browser.
+
+The published build has a Content Security Policy with `connect-src 'none'`. With it, the
+browser refuses every network request from the page's code (fetch, XMLHttpRequest, WebSocket
+and beacons), so the page cannot send image data anywhere. The policy is set in
+`vite.config.ts` and applies to `npm run build`. The development server (`npm run dev`) runs
+without it, because Vite's live reload uses a WebSocket.
+
+What stays on the computer:
+
+- The autosave is in the browser's localStorage. It holds the masks and the SeriesInstanceUID,
+  and no pixel data or patient data.
+- A saved annotation file holds the same.
+- Exports are created in the browser and saved as a download or into a folder you choose.
+
+The **GitHub** button is an ordinary link and opens the repository in a new tab.
 
 ## Limitations
 
