@@ -1,11 +1,11 @@
-# RadioIllustrator
+# Radioillustrator
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="public/logo-dark.png">
-  <img src="public/logo.png" alt="RadioIllustrator logo" width="640">
+  <img src="public/logo.png" alt="Radioillustrator logo" width="640">
 </picture>
 
-RadioIllustrator draws colored overlays on a DICOM series and exports the annotated series for
+Radioillustrator draws colored overlays on a DICOM series and exports the annotated series for
 a Radiopaedia case. A typical use is marking the spinal canal on every slice of a sagittal or
 axial spine MRI. The app runs in the browser and reads the DICOM files on your computer.
 
@@ -121,7 +121,7 @@ contain no patient data.
 
 [Radiouploader](https://github.com/gmadevs/Radiouploader) is a desktop app that anonymizes a
 DICOM study and uploads it to Radiopaedia as a draft case. It can upload the Secondary Capture
-series from RadioIllustrator together with the original series.
+series from Radioillustrator together with the original series.
 
 1. In **Export…**, tick **DICOM Secondary Capture (for Radiouploader)**. In **Series
    description**, type the name the series should have on Radiopaedia.
@@ -141,7 +141,7 @@ Check three things in Radiouploader:
   warning for every long text field. The description is the text you typed in the export
   dialog, so make sure it has no patient data.
 - Radiouploader applies its window setting only to grayscale images. The annotated series is
-  in color, so it keeps the window you set in RadioIllustrator before the export.
+  in color, so it keeps the window you set in Radioillustrator before the export.
 - A legend is text in the pixels. Radiouploader's burnt-in text check may mark it. The legend
   holds only the structure names.
 

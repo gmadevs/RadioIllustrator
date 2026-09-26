@@ -96,7 +96,7 @@ export function secondaryCapture(source: Slice, rgba: ImageData, opts: ScOptions
     str(0x0008, 0x0016, 'UI', SC_SOP_CLASS),
     str(0x0008, 0x0018, 'UI', sopUid),
     str(0x0008, 0x0064, 'CS', 'WSD'),
-    str(0x0008, 0x2111, 'ST', 'Annotated with RadioIllustrator'),
+    str(0x0008, 0x2111, 'ST', 'Annotated with Radioillustrator'),
     str(0x0020, 0x000e, 'UI', opts.seriesUid),
     us(0x0028, 0x0002, 3),
     str(0x0028, 0x0004, 'CS', 'RGB'),

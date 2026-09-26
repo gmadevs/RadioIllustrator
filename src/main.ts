@@ -680,9 +680,10 @@ async function loadProject(file: File): Promise<void> {
   let p: ProjectFile
   try {
     p = JSON.parse(await file.text())
+    // The file format keeps the original spelling, so older files still open.
     if (p.app !== 'RadioIllustrator') throw new Error()
   } catch {
-    toast('This is not a RadioIllustrator annotation file.', true)
+    toast('This is not a Radioillustrator annotation file.', true)
     return
   }
   if (p.rows !== series.rows || p.cols !== series.cols || p.slices !== series.slices.length) {

@@ -1,4 +1,4 @@
-# RadioIllustrator
+# Radioillustrator
 
 Vite + TypeScript, no framework. `npm test` (vitest) and `npm run typecheck` before committing.
 All user-facing text (interface, messages, documentation) is in English, American spelling.
