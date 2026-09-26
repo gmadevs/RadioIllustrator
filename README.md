@@ -1,6 +1,9 @@
 # RadioIllustrator
 
-![RadioIllustrator logo](public/logo.jpeg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="public/logo-dark.png">
+  <img src="public/logo.png" alt="RadioIllustrator logo" width="640">
+</picture>
 
 RadioIllustrator draws colored overlays on a DICOM series and exports the annotated series for
 a Radiopaedia case. A typical use is marking the spinal canal on every slice of a sagittal or
@@ -195,8 +198,9 @@ data. Exports are created in the browser and saved as a download or into the fol
 | `src/export.ts` | PNG, JPEG and DICOM output, zip, saving to a folder |
 | `src/main.ts` | user interface |
 
-The logo is `public/logo.jpeg`. The favicon and the toolbar icon (`public/favicon.png`,
-`public/apple-touch-icon.png`, `public/icon-512.png`) are cut from it.
+The logo source is `design/logo.jpeg`. `python3 design/make-logo.py` (needs Pillow) makes the
+transparent logos `public/logo.png` and `public/logo-dark.png`, and the icons
+`public/favicon.png`, `public/apple-touch-icon.png` and `public/icon-512.png`.
 
 `npm test` runs `tests/core.test.ts`. If `~/radiouploader-sample` exists, the tests also load
 the DICOM files in it.

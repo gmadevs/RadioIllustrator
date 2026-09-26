@@ -874,6 +874,13 @@ $('help').addEventListener('click', () => {
   content.querySelectorAll('h1, h2, h3').forEach((h) => {
     h.id = (h.textContent ?? '').trim().toLowerCase().replace(/[^\w\- ]+/g, '').replace(/ /g, '-')
   })
+  // The dialog is always dark: show the dark variant of a <picture>.
+  content.querySelectorAll('picture').forEach((pic) => {
+    const dark = pic.querySelector('source[media*="dark"]')?.getAttribute('srcset')
+    const img = pic.querySelector('img')
+    if (dark && img) img.setAttribute('src', dark)
+    pic.querySelectorAll('source').forEach((src) => src.remove())
+  })
   // The README points at public/ for GitHub; on the site those files are at the root.
   content.querySelectorAll<HTMLImageElement>('img[src^="public/"]').forEach((img) => {
     img.src = `./${img.getAttribute('src')!.slice('public/'.length)}`
