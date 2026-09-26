@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RadioIllustrator</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>RadioIllustrator</h1>
+      <button id="open-files" title="Open one or more DICOM files">Open files</button>
+      <button id="open-dir" title="Open a folder containing a DICOM series">Open folder</button>
+      <select id="series-select" hidden title="Series"></select>
+      <span class="spacer"></span>
+      <button id="load-project" disabled>Load annotations</button>
+      <button id="save-project" disabled>Save annotations</button>
+      <button id="export" class="primary" disabled>Export…</button>
+      <input id="file-input" type="file" multiple hidden />
+      <input id="dir-input" type="file" webkitdirectory hidden />
+      <input id="project-input" type="file" accept=".json,application/json" hidden />
+    </header>
+
+    <main>
+      <aside id="tools">
+        <section>
+          <h2>Tool</h2>
+          <div class="tool-grid">
+            <button data-tool="brush" title="Brush (B), hold Alt to erase">Brush <kbd>B</kbd></button>
+            <button data-tool="eraser" title="Eraser (E)">Eraser <kbd>E</kbd></button>
+            <button data-tool="polygon" title="Polygon (P), hold Alt to subtract">Polygon <kbd>P</kbd></button>
+            <button data-tool="pan" title="Pan (H), also Space or the middle button">Pan <kbd>H</kbd></button>
+          </div>
+          <label class="row">
+            <span>Size</span>
+            <input id="brush-size" type="range" min="0.5" max="40" step="0.5" value="4" />
+            <output id="brush-size-out">4</output>
+          </label>
+        </section>
+
+        <section>
+          <h2>Window</h2>
+          <select id="wl-preset"></select>
+          <p class="hint">Drag with the right button to change level and width.</p>
+        </section>
+
+        <section>
+          <h2>Current slice</h2>
+          <p id="slice-state" class="state">—</p>
+          <div class="stack">
+            <button id="copy-prev" title="Copy the mask of the previous slice (C)">Copy from previous <kbd>C</kbd></button>
+            <button id="copy-next" title="Copy the mask of the next slice (Shift+C)">Copy from next</button>
+            <button id="demote-key" title="Go back to the interpolated shape">Remove key slice</button>
+            <button id="clear-slice" title="Empty key slice: the structure ends here">Clear slice</button>
+          </div>
+        </section>
+
+        <section class="shortcuts">
+          <h2>Shortcuts</h2>
+          <dl>
+            <dt>Wheel, ↑ ↓</dt><dd>change slice</dd>
+            <dt>Ctrl + wheel</dt><dd>zoom</dd>
+            <dt>Right drag</dt><dd>window</dd>
+            <dt>[ ]</dt><dd>brush size</dd>
+            <dt>Enter / double click</dt><dd>close the polygon</dd>
+            <dt>Esc</dt><dd>cancel the polygon</dd>
+            <dt>⌘Z / ⇧⌘Z</dt><dd>undo / redo</dd>
+            <dt>F</dt><dd>fit to view</dd>
+            <dt>O</dt><dd>show/hide overlay</dd>
+          </dl>
+        </section>
+      </aside>
+
+      <section id="stage">
+        <canvas id="view"></canvas>
+        <div id="dropzone">
+          <div>
+            <strong>Drop a DICOM series here</strong>
+            <span>files or a folder, in any plane</span>
+            <span class="small">The files stay on this computer. Nothing is uploaded.</span>
+          </div>
+        </div>
+        <div id="hud"></div>
+      </section>
+
+      <aside id="structures">
+        <div class="panel-head">
+          <h2>Structures</h2>
+          <button id="add-structure" title="New structure">+ New</button>
+        </div>
+        <ul id="structure-list"></ul>
+        <datalist id="structure-names">
+          <option value="Spinal canal"></option>
+          <option value="Spinal cord"></option>
+          <option value="Thecal sac"></option>
+          <option value="Neural foramen"></option>
+          <option value="Intervertebral disc"></option>
+          <option value="Sulcus"></option>
+          <option value="Lesion"></option>
+        </datalist>
+        <label class="row check">
+          <input id="legend-preview" type="checkbox" />
+          <span>Legend on the image</span>
+        </label>
+      </aside>
+    </main>
+
+    <footer>
+      <span id="slice-label">—</span>
+      <div id="timeline">
+        <canvas id="keystrip" title="Key slices (full height) and interpolated slices (short) of the active structure"></canvas>
+        <input id="slice-slider" type="range" min="0" max="0" value="0" />
+      </div>
+    </footer>
+
+    <dialog id="export-dialog">
+      <form method="dialog">
+        <h2>Export</h2>
+
+        <fieldset>
+          <legend>Images</legend>
+          <label><input type="radio" name="image" value="png" checked /> PNG</label>
+          <label><input type="radio" name="image" value="jpeg" /> JPEG</label>
+          <label><input type="radio" name="image" value="" /> none</label>
+        </fieldset>
+
+        <label class="check"><input id="ex-dicom" type="checkbox" checked /> DICOM Secondary Capture (for Radiouploader)</label>
+        <label class="check"><input id="ex-plain" type="checkbox" /> Also the same series without overlay</label>
+        <label class="check"><input id="ex-legend" type="checkbox" /> Legend</label>
+
+        <div class="grid2">
+          <label>Scale
+            <select id="ex-scale">
+              <option value="1">1× (native)</option>
+              <option value="2">2×</option>
+              <option value="3">3×</option>
+            </select>
+          </label>
+          <label>Series description
+            <input id="ex-description" type="text" />
+          </label>
+          <label>From slice <input id="ex-from" type="number" min="1" /></label>
+          <label>To slice <input id="ex-to" type="number" min="1" /></label>
+        </div>
+        <div class="range-buttons">
+          <button type="button" id="ex-all">All slices</button>
+          <button type="button" id="ex-annotated">Annotated range only</button>
+        </div>
+        <p class="hint" id="ex-summary"></p>
+
+        <progress id="ex-progress" value="0" max="1" hidden></progress>
+        <menu>
+          <button value="cancel" formnovalidate>Close</button>
+          <button type="button" id="ex-folder" hidden>Save to folder…</button>
+          <button type="button" id="ex-zip" class="primary">Download zip</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <div id="toast" role="status"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
