@@ -6,6 +6,8 @@ in the browser. DICOM files are read locally and are not uploaded anywhere.
 
 Live version: <https://gmadevs.github.io/RadioIllustrator/>
 
+In the app, **Help** shows this document and **GitHub** opens this repository.
+
 ## Running it locally
 
 ```bash

@@ -16,6 +16,8 @@
       <button id="load-project" disabled>Load annotations</button>
       <button id="save-project" disabled>Save annotations</button>
       <button id="export" class="primary" disabled>Export…</button>
+      <button id="help" title="Documentation">Help</button>
+      <a class="button" href="https://github.com/gmadevs/RadioIllustrator" target="_blank" rel="noopener" title="Source code on GitHub">GitHub</a>
       <input id="file-input" type="file" multiple hidden />
       <input id="dir-input" type="file" webkitdirectory hidden />
       <input id="project-input" type="file" accept=".json,application/json" hidden />
@@ -155,6 +157,13 @@
           <button type="button" id="ex-zip" class="primary">Download zip</button>
         </menu>
       </form>
+    </dialog>
+
+    <dialog id="help-dialog" aria-label="Documentation">
+      <form method="dialog" class="help-head">
+        <button value="close">Close</button>
+      </form>
+      <article id="help-content" class="doc"></article>
     </dialog>
 
     <div id="toast" role="status"></div>

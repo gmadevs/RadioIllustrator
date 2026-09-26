@@ -469,3 +469,103 @@ header button {
     grid-template-columns: 1fr;
   }
 }
+
+a.button {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.button:hover {
+  border-color: #454b52;
+}
+
+#help-dialog {
+  width: min(820px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 0;
+}
+
+#help-dialog .help-head {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.doc {
+  padding: 4px 28px 28px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.doc h1 {
+  font-size: 22px;
+  margin: 16px 0 8px;
+}
+
+.doc h2 {
+  font-size: 17px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text);
+  margin: 28px 0 8px;
+}
+
+.doc h3 {
+  font-size: 15px;
+  margin: 20px 0 6px;
+}
+
+.doc a {
+  color: #7fb2ff;
+}
+
+.doc code {
+  font: 12.5px ui-monospace, monospace;
+  background: var(--panel-2);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.doc pre {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+}
+
+.doc pre code {
+  background: none;
+  padding: 0;
+}
+
+.doc table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+  font-size: 13px;
+  display: block;
+  overflow-x: auto;
+}
+
+.doc th,
+.doc td {
+  border: 1px solid var(--line);
+  padding: 5px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.doc th {
+  background: var(--panel-2);
+}

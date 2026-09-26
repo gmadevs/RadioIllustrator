@@ -1,3 +1,5 @@
+import { marked } from 'marked'
+import readme from '../README.md?raw'
 import { autoWindow, loadFiles, type Series } from './dicom/load'
 import { buildExport, download, saveToDirectory, zip, type ExportedFile } from './export'
 import { fillPolygon, isEmpty, stroke, type Pt } from './mask/raster'
@@ -593,7 +595,7 @@ function setBrush(r: number): void {
 window.addEventListener('keydown', (e) => {
   const target = e.target
   if (target instanceof HTMLElement && target.matches('input[type=text], input[type=number], textarea, select')) return
-  if ($<HTMLDialogElement>('export-dialog').open) return
+  if ($<HTMLDialogElement>('export-dialog').open || $<HTMLDialogElement>('help-dialog').open) return
   const mod = e.metaKey || e.ctrlKey
   if (mod && e.key.toLowerCase() === 'z') {
     e.preventDefault()
@@ -850,6 +852,16 @@ $<HTMLInputElement>('project-input').addEventListener('change', (e) => {
   input.value = ''
 })
 $('export').addEventListener('click', openExport)
+$('help').addEventListener('click', () => {
+  const content = $<HTMLElement>('help-content')
+  // The README is part of this repository, so its HTML is trusted.
+  if (!content.innerHTML) content.innerHTML = marked.parse(readme, { async: false })
+  content.querySelectorAll('a[href^="http"]').forEach((a) => {
+    a.setAttribute('target', '_blank')
+    a.setAttribute('rel', 'noopener')
+  })
+  $<HTMLDialogElement>('help-dialog').showModal()
+})
 $('add-structure').addEventListener('click', () => {
   addStructure()
   refresh(false)
