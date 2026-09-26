@@ -33,7 +33,7 @@ body {
 
 h1 {
   font-size: 15px;
-  margin: 0 12px 0 0;
+  margin: 0 12px 0 -2px;
   letter-spacing: 0.02em;
 }
 
@@ -568,4 +568,38 @@ a.button:hover {
 
 .doc th {
   background: var(--panel-2);
+}
+
+#structure-list .swatches {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px;
+}
+
+#structure-list .swatch {
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: var(--c);
+}
+
+#structure-list .swatch:hover:not(:disabled) {
+  border-color: var(--text);
+}
+
+#structure-list .swatch.on {
+  box-shadow: 0 0 0 2px var(--panel-2), 0 0 0 3px var(--text);
+}
+
+.brand-icon {
+  flex: none;
+  display: block;
+}
+
+.doc img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-top: 16px;
 }

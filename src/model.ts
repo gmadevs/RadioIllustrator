@@ -20,7 +20,26 @@ export interface Structure {
   sdf: Map<number, KeyField>
 }
 
-export const PALETTE = ['#ff3b30', '#ffcc00', '#34c759', '#00c7ff', '#af52de', '#ff9500', '#ff2d92', '#5ac8fa']
+/** The ten standard colors offered in each structure card, in hue order. */
+export const PALETTE: { name: string; hex: string }[] = [
+  { name: 'Red', hex: '#ff3b30' },
+  { name: 'Orange', hex: '#ff9500' },
+  { name: 'Yellow', hex: '#ffcc00' },
+  { name: 'Green', hex: '#34c759' },
+  { name: 'Teal', hex: '#00c7be' },
+  { name: 'Cyan', hex: '#32ade6' },
+  { name: 'Blue', hex: '#007aff' },
+  { name: 'Purple', hex: '#af52de' },
+  { name: 'Magenta', hex: '#ff2d92' },
+  { name: 'Brown', hex: '#a2845e' },
+]
+
+/** New structures take the palette in this order, so consecutive ones differ clearly. */
+const NEW_ORDER = [0, 2, 3, 5, 7, 1, 6, 8, 4, 9]
+
+export function paletteColor(n: number): string {
+  return PALETTE[NEW_ORDER[n % NEW_ORDER.length]].hex
+}
 
 let nextId = 1
 

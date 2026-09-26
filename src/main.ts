@@ -5,6 +5,7 @@ import { buildExport, download, saveToDirectory, zip, type ExportedFile } from '
 import { fillPolygon, isEmpty, stroke, type Pt } from './mask/raster'
 import {
   PALETTE,
+  paletteColor,
   History,
   createStructure,
   fromProjectFile,
@@ -143,7 +144,7 @@ function buildWlPresets(): void {
 // ---------------------------------------------------------------- structures
 
 function addStructure(name?: string): Structure {
-  const s = createStructure(name ?? `Structure ${structures.length + 1}`, PALETTE[structures.length % PALETTE.length])
+  const s = createStructure(name ?? `Structure ${structures.length + 1}`, paletteColor(structures.length))
   structures.push(s)
   active = s
   renderList()
@@ -165,6 +166,10 @@ function renderList(): void {
         <button class="icon vis" title="Show/hide">${s.visible ? '●' : '○'}</button>
         <button class="icon del" title="Delete structure">✕</button>
       </div>
+      <div class="swatches">${PALETTE.map(
+        (c) =>
+          `<button class="swatch${c.hex === s.color ? ' on' : ''}" data-color="${c.hex}" title="${c.name}" aria-label="${c.name}"></button>`,
+      ).join('')}</div>
       <label class="row">
         <span class="meta">Opacity</span>
         <input type="range" class="opacity" min="0" max="1" step="0.05" value="${s.opacity}" />
@@ -183,10 +188,19 @@ function renderList(): void {
       }
     })
     const q = <T extends HTMLElement>(sel: string) => li.querySelector(sel) as T
-    q<HTMLInputElement>('input[type=color]').addEventListener('input', (e) => {
-      s.color = (e.target as HTMLInputElement).value
-      changed()
-    })
+    const colorInput = q<HTMLInputElement>('input[type=color]')
+    const swatches = [...li.querySelectorAll<HTMLButtonElement>('.swatch')]
+    // Set through the CSSOM: the Content Security Policy blocks inline style attributes.
+    swatches.forEach((b) => b.style.setProperty('--c', b.dataset.color!))
+    const setColor = (hex: string) => {
+      s.color = hex
+      colorInput.value = hex
+      swatches.forEach((b) => b.classList.toggle('on', b.dataset.color === hex))
+      changed(false)
+    }
+    swatches.forEach((b) => b.addEventListener('click', () => setColor(b.dataset.color!)))
+    // Updating in place keeps the system color picker open while you drag in it.
+    colorInput.addEventListener('input', () => setColor(colorInput.value))
     q<HTMLInputElement>('input[type=text]').addEventListener('input', (e) => {
       s.name = (e.target as HTMLInputElement).value
       changed(false)
@@ -859,6 +873,10 @@ $('help').addEventListener('click', () => {
   // GitHub-style heading ids, so links like #uploading-with-radiouploader work here too.
   content.querySelectorAll('h1, h2, h3').forEach((h) => {
     h.id = (h.textContent ?? '').trim().toLowerCase().replace(/[^\w\- ]+/g, '').replace(/ /g, '-')
+  })
+  // The README points at public/ for GitHub; on the site those files are at the root.
+  content.querySelectorAll<HTMLImageElement>('img[src^="public/"]').forEach((img) => {
+    img.src = `./${img.getAttribute('src')!.slice('public/'.length)}`
   })
   content.querySelectorAll('a[href^="http"]').forEach((a) => {
     a.setAttribute('target', '_blank')

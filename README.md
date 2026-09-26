@@ -1,5 +1,7 @@
 # RadioIllustrator
 
+![RadioIllustrator logo](public/logo.jpeg)
+
 RadioIllustrator draws colored overlays on a DICOM series and exports the annotated series for
 a Radiopaedia case. A typical use is marking the spinal canal on every slice of a sagittal or
 axial spine MRI. The app runs in the browser and reads the DICOM files on your computer.
@@ -23,7 +25,10 @@ static build to `dist/`.
 1. Drop a folder or DICOM files onto the window, or use **Open files** or **Open folder**. If
    the files hold more than one series, choose one in the menu next to these buttons.
 2. The right panel has one structure, "Spinal canal". **+ New** adds another. Each structure
-   has a name, a color, an opacity, and **outline** and **interpolate** checkboxes.
+   has a name, a color, an opacity, and **outline** and **interpolate** checkboxes. The row of
+   ten swatches sets one of the standard colors (red, orange, yellow, green, teal, cyan, blue,
+   purple, magenta, brown). The square next to the name opens the system color picker for any
+   other color.
 3. Draw the structure on a few slices. Each slice you draw on becomes a key slice. The slices
    between two key slices are filled by interpolation. When you edit an interpolated slice, it
    becomes a key slice.
@@ -189,6 +194,9 @@ data. Exports are created in the browser and saved as a download or into the fol
 | `src/render.ts` | image and overlay compositing, used by the viewer and the export |
 | `src/export.ts` | PNG, JPEG and DICOM output, zip, saving to a folder |
 | `src/main.ts` | user interface |
+
+The logo is `public/logo.jpeg`. The favicon and the toolbar icon (`public/favicon.png`,
+`public/apple-touch-icon.png`, `public/icon-512.png`) are cut from it.
 
 `npm test` runs `tests/core.test.ts`. If `~/radiouploader-sample` exists, the tests also load
 the DICOM files in it.
