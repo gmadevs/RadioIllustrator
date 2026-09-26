@@ -203,9 +203,3 @@ the DICOM files in it.
 
 Each push to `main` runs the tests, builds the site and publishes it on GitHub Pages
 (`.github/workflows/pages.yml`).
-
-## Writing documentation
-
-The documentation uses plain technical prose. Headings name the topic of the section, each
-sentence makes one point, dashes are rare, and bold marks interface labels and warnings only.
-The full rules are in `CLAUDE.md`. Run `npm run prose` on a page after you change it.
