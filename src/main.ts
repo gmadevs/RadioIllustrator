@@ -18,7 +18,7 @@ import {
 } from './model'
 import { annotated, drawLegend, grayImage, overlayImage, toCanvas, type WindowLevel } from './render'
 
-type Tool = 'brush' | 'eraser' | 'polygon' | 'pan'
+type Tool = 'brush' | 'eraser' | 'polygon' | 'pan' | 'window'
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T
 
@@ -478,13 +478,80 @@ function drawKeystrip(): void {
 
 let drag: { kind: 'pan' | 'wl'; x: number; y: number; ox: number; oy: number; c: number; w: number } | null = null
 
+/**
+ * Touch screens. Once a pen has been used, a finger pans and the pen draws, as
+ * in drawing apps; without a pen, one finger draws. Two fingers always pinch
+ * to zoom and pan, and cancel whatever the first finger started.
+ */
+const touches = new Map<number, { x: number; y: number }>()
+let penSeen = false
+let pinch: { d: number; cx: number; cy: number; scale: number; ox: number; oy: number } | null = null
+/** After a pinch, remaining fingers do nothing until all are lifted. */
+let touchLocked = false
+/** A finger in polygon mode adds its vertex when lifted, so a pinch adds none. */
+let pendingTap: { id: number; x: number; y: number; moved: boolean } | null = null
+
 view.addEventListener('contextmenu', (e) => e.preventDefault())
+
+function startPinch(): void {
+  const [a, b] = [...touches.values()]
+  pinch = {
+    d: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)),
+    cx: (a.x + b.x) / 2,
+    cy: (a.y + b.y) / 2,
+    scale: cam.scale,
+    ox: cam.ox,
+    oy: cam.oy,
+  }
+}
+
+function cancelStroke(): void {
+  if (!strokeState) return
+  setKey(strokeState.s, slice, strokeState.before)
+  strokeState = null
+  refresh(false)
+}
+
+function polygonTap(x: number, y: number, alt: boolean, coarse: boolean): void {
+  if (polygon.length >= 3) {
+    const [fx, fy] = polygon[0]
+    if (Math.hypot(fx * cam.scale + cam.ox - x, fy * cam.scale + cam.oy - y) < (coarse ? 22 : 9)) {
+      closePolygon(alt)
+      return
+    }
+  }
+  polygon.push(toImage(x, y))
+  refresh(false)
+}
 
 view.addEventListener('pointerdown', (e) => {
   if (!series) return
-  view.setPointerCapture(e.pointerId)
+  try {
+    view.setPointerCapture(e.pointerId)
+  } catch {
+    // Not an active pointer (synthetic events); capture is only a convenience.
+  }
   const { offsetX: x, offsetY: y } = e
-  if (e.button === 2) {
+  if (e.pointerType === 'pen') penSeen = true
+
+  if (e.pointerType === 'touch') {
+    touches.set(e.pointerId, { x, y })
+    if (touches.size === 2) {
+      cancelStroke()
+      drag = null
+      pendingTap = null
+      touchLocked = true
+      startPinch()
+      return
+    }
+    if (touches.size > 2 || touchLocked) return
+    if (penSeen && tool !== 'window') {
+      drag = { kind: 'pan', x, y, ox: cam.ox, oy: cam.oy, c: 0, w: 0 }
+      return
+    }
+  }
+
+  if (e.button === 2 || tool === 'window') {
     drag = { kind: 'wl', x, y, ox: 0, oy: 0, c: wl.center, w: wl.width }
     return
   }
@@ -493,21 +560,14 @@ view.addEventListener('pointerdown', (e) => {
     return
   }
   if (e.button !== 0) return
-  const p = toImage(x, y)
 
   if (tool === 'polygon') {
-    if (polygon.length >= 3) {
-      const [fx, fy] = polygon[0]
-      if (Math.hypot(fx * cam.scale + cam.ox - x, fy * cam.scale + cam.oy - y) < 9) {
-        closePolygon(e.altKey)
-        return
-      }
-    }
-    polygon.push(p)
-    refresh(false)
+    if (e.pointerType === 'touch') pendingTap = { id: e.pointerId, x, y, moved: false }
+    else polygonTap(x, y, e.altKey, e.pointerType === 'pen')
     return
   }
 
+  const p = toImage(x, y)
   const s = ensureActive()
   const { before, mask } = beginEdit(s)
   const value: 0 | 1 = tool === 'eraser' || e.altKey ? 0 : 1
@@ -518,7 +578,26 @@ view.addEventListener('pointerdown', (e) => {
 
 view.addEventListener('pointermove', (e) => {
   const { offsetX: x, offsetY: y } = e
-  pointer = { x, y }
+  // Fingers have no hover, so only mouse and pen show the brush outline.
+  pointer = e.pointerType === 'touch' ? null : { x, y }
+  if (e.pointerType === 'touch' && touches.has(e.pointerId)) {
+    touches.set(e.pointerId, { x, y })
+    if (pinch && touches.size >= 2) {
+      const [a, b] = [...touches.values()]
+      const d = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y))
+      const cx = (a.x + b.x) / 2
+      const cy = (a.y + b.y) / 2
+      // Keep the image point that was under the fingers' midpoint under it.
+      const ix = (pinch.cx - pinch.ox) / pinch.scale
+      const iy = (pinch.cy - pinch.oy) / pinch.scale
+      cam.scale = Math.min(40, Math.max(0.1, (pinch.scale * d) / pinch.d))
+      cam.ox = cx - ix * cam.scale
+      cam.oy = cy - iy * cam.scale
+      refresh(false)
+      return
+    }
+    if (pendingTap?.id === e.pointerId && Math.hypot(x - pendingTap.x, y - pendingTap.y) > 10) pendingTap.moved = true
+  }
   if (drag?.kind === 'pan') {
     cam.ox = drag.ox + x - drag.x
     cam.oy = drag.oy + y - drag.y
@@ -534,7 +613,17 @@ view.addEventListener('pointermove', (e) => {
   refresh(false)
 })
 
-function endPointer(): void {
+function endPointer(e: PointerEvent): void {
+  if (e.pointerType === 'touch') {
+    touches.delete(e.pointerId)
+    if (touches.size < 2) pinch = null
+    if (pendingTap?.id === e.pointerId) {
+      if (!pendingTap.moved && e.type === 'pointerup') polygonTap(pendingTap.x, pendingTap.y, false, true)
+      pendingTap = null
+    }
+    if (touches.size === 0) touchLocked = false
+    if (touches.size > 0 && !strokeState) return
+  }
   drag = null
   if (strokeState) {
     const { s, before } = strokeState
@@ -595,7 +684,7 @@ function setTool(t: Tool): void {
   tool = t
   if (t !== 'polygon') polygon = []
   document.querySelectorAll<HTMLButtonElement>('[data-tool]').forEach((b) => b.classList.toggle('active', b.dataset.tool === t))
-  view.style.cursor = t === 'pan' ? 'grab' : t === 'polygon' ? 'crosshair' : 'none'
+  view.style.cursor = t === 'pan' ? 'grab' : t === 'window' ? 'ns-resize' : t === 'polygon' ? 'crosshair' : 'none'
   refresh(false)
 }
 
@@ -632,6 +721,7 @@ window.addEventListener('keydown', (e) => {
     case 'e': case 'E': setTool('eraser'); break
     case 'p': case 'P': setTool('polygon'); break
     case 'h': case 'H': setTool('pan'); break
+    case 'w': case 'W': setTool('window'); break
     case 'f': case 'F': fit(); break
     case 'o': case 'O': overlayOn = !overlayOn; refresh(false); break
     case 'c': copyFrom(-1); break
@@ -909,6 +999,8 @@ $<HTMLSelectElement>('wl-preset').addEventListener('change', (e) => {
   refresh(false)
 })
 
+$('undo').addEventListener('click', () => undo())
+$('redo').addEventListener('click', () => undo(true))
 $('copy-prev').addEventListener('click', () => copyFrom(-1))
 $('copy-next').addEventListener('click', () => copyFrom(1))
 $('demote-key').addEventListener('click', () => {

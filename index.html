@@ -35,6 +35,11 @@
             <button data-tool="eraser" title="Eraser (E)">Eraser <kbd>E</kbd></button>
             <button data-tool="polygon" title="Polygon (P), hold Alt to subtract">Polygon <kbd>P</kbd></button>
             <button data-tool="pan" title="Pan (H), also Space or the middle button">Pan <kbd>H</kbd></button>
+            <button data-tool="window" title="Window (W): drag to change level and width">Window <kbd>W</kbd></button>
+          </div>
+          <div class="tool-grid">
+            <button id="undo" title="Undo (⌘Z)">Undo</button>
+            <button id="redo" title="Redo (⇧⌘Z)">Redo</button>
           </div>
           <label class="row">
             <span>Size</span>
@@ -46,7 +51,7 @@
         <section>
           <h2>Window</h2>
           <select id="wl-preset"></select>
-          <p class="hint">Drag with the right button to change level and width.</p>
+          <p class="hint">Drag with the right button, or use the Window tool, to change level and width.</p>
         </section>
 
         <section>
@@ -72,6 +77,7 @@
             <dt>⌘Z / ⇧⌘Z</dt><dd>undo / redo</dd>
             <dt>F</dt><dd>fit to view</dd>
             <dt>O</dt><dd>show/hide overlay</dd>
+            <dt>Two fingers</dt><dd>pinch to zoom and pan</dd>
           </dl>
         </section>
       </aside>

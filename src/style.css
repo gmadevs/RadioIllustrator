@@ -19,6 +19,8 @@
 html,
 body {
   height: 100%;
+  /* No double-tap zoom on buttons on tablets. */
+  touch-action: manipulation;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -196,6 +198,9 @@ aside section {
 }
 
 #view {
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
   position: absolute;
   inset: 0;
   width: 100%;

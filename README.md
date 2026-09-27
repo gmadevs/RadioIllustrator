@@ -55,8 +55,10 @@ corner. The export can include the same box.
 | Eraser | E | erases |
 | Polygon | P | click to add vertices; close with Enter, a double click or a click on the first vertex; hold Alt while pressing Enter or clicking the first vertex to subtract |
 | Pan | H | moves the image; Space or the middle mouse button also pan |
+| Window | W | drag to change the window: horizontal changes the width, vertical the level |
 
-**Size** sets the brush radius in image pixels, from 0.5 to 40.
+**Size** sets the brush radius in image pixels, from 0.5 to 40. **Undo** and **Redo** under
+the tools do the same as the keyboard shortcuts.
 
 ### Shortcuts
 
@@ -75,12 +77,34 @@ corner. The export can include the same box.
 | ⌘Z or Ctrl+Z | undo |
 | ⇧⌘Z, Ctrl+Shift+Z or Ctrl+Y | redo |
 | ⌘S or Ctrl+S | save annotations |
+| Two fingers on a touch screen | pinch to zoom, move to pan |
 
 Undo keeps the last 200 edits.
 
-For CT series, the **Window** menu has three presets: soft tissue (40/400), bone (400/1800) and
+For CT series, the menu in the **Window** section has three presets: soft tissue (40/400), bone (400/1800) and
 canal/cord (40/250). The other entries are the window stored in the DICOM file and an automatic
 window from the 1st and 99th percentiles of the image.
+
+### Using a tablet and pen
+
+The app works with touch screens and styluses, such as an iPad with Apple Pencil, in Safari or
+Chrome.
+
+- The pen draws with the selected tool. Once you have used the pen, one finger pans the image,
+  so your hand does not draw by mistake.
+- Without a pen, one finger draws.
+- Two fingers pinch to zoom and move to pan. A stroke that the first finger started is
+  cancelled.
+- With the polygon tool, tap to add vertices and tap the first vertex to close the polygon.
+- The **Window** tool changes the window with a finger or the pen, in place of the right-button
+  drag.
+- **Undo** and **Redo** are under the tools. Keyboard shortcuts work with a hardware keyboard.
+- Subtracting with a polygon and erasing with the brush need the Alt key. Without a keyboard,
+  use the **Eraser**.
+- Get the DICOM files into the Files app first, then choose them with **Open files**. Safari
+  on iPad may not allow choosing a folder with **Open folder**.
+- **Download zip** saves the export to the Downloads folder in Files. **Save to folder…** is
+  not available in Safari.
 
 ### Interpolation
 
