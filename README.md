@@ -13,6 +13,9 @@ Live version: <https://gmadevs.github.io/RadioIllustrator/>
 
 In the app, **Help** shows this document and **GitHub** opens this repository.
 
+Radiouploader, the desktop app that uploads a study to Radiopaedia, has the same drawing tools
+built in. See [Uploading with Radiouploader](#uploading-with-radiouploader).
+
 ## Running it locally
 
 ```bash
@@ -144,8 +147,32 @@ contain no patient data.
 ## Uploading with Radiouploader
 
 [Radiouploader](https://github.com/gmadevs/Radiouploader) is a desktop app that anonymizes a
-DICOM study and uploads it to Radiopaedia as a draft case. It can upload the Secondary Capture
-series from Radioillustrator together with the original series.
+DICOM study and uploads it to Radiopaedia as a draft case. From version 1.6.0 it has the drawing
+tools of Radioillustrator built in. **Annotate**, below each series in Radiouploader, opens them:
+
+- the brush, eraser and polygon tools, with Alt to erase or subtract;
+- structures with a name, a color from the same ten swatches or any other, an opacity and an
+  outline;
+- interpolation between key slices, with the same method as here, and an empty key slice to end
+  a structure;
+- a legend in the lower left corner of the images;
+- the CT window presets and a window set with the right mouse button.
+
+**Add to the case** writes the annotated series next to the original one, and it is anonymized
+and uploaded with the rest of the study. Radiouploader reads compressed series (JPEG, JPEG 2000,
+RLE and others), which Radioillustrator refuses. The annotated files stay in Radiouploader's
+temporary folder and are deleted with it. The documentation is at
+<https://gmadevs.github.io/Radiouploader/guide/annotate>.
+
+Radiouploader does not have pan and zoom, pinch gestures or the **Scale** option, and it keeps
+the annotations only while the study is open. Radioillustrator is still the tool for a manual
+upload of PNG or JPEG images, for a tablet with a pen, and for annotations saved in a
+`.radioillustrator.json` file.
+
+### Uploading a Radioillustrator export with Radiouploader
+
+Radiouploader can also upload the Secondary Capture series exported from Radioillustrator,
+together with the original series.
 
 1. In **Export…**, tick **DICOM Secondary Capture (for Radiouploader)**. In **Series
    description**, type the name the series should have on Radiopaedia.
@@ -159,11 +186,13 @@ as a separate series with SeriesNumber 9001 and your description, with the slice
 original order. Radiouploader uses Radiopaedia's anonymizer. It removes the patient name and ID
 and leaves the series description, the slice positions and the pixels as they are.
 
-Check three things in Radiouploader:
+Check four things in Radiouploader:
 
 - The anonymizer warns that the series description may contain personal data. It gives this
   warning for every long text field. The description is the text you typed in the export
   dialog, so make sure it has no patient data.
+- Radiouploader writes text in ASCII when it anonymizes, from version 1.6.0. A description
+  with accents, such as "Encéfalo", is uploaded as "Encefalo".
 - Radiouploader applies its window setting only to grayscale images. The annotated series is
   in color, so it keeps the window you set in Radioillustrator before the export.
 - A legend is text in the pixels. Radiouploader's burnt-in text check may mark it. The legend
